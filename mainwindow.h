@@ -29,6 +29,13 @@ private:
 private slots:
     void onLabelClick(QPointF);
     void onLabelMove(QPointF);
+    void on_pushButton_location_clicked();
+    void on_pushButton_data_clicked();
+    void on_pushButton_settings_clicked();
+    void on_pushButton_back_clicked();
+    void on_pushButton_clear_clicked();
+    void on_pushButton_send_clicked();
+    void on_pushButton_packets_clicked();
 };
 
 #endif // MAINWINDOW_H

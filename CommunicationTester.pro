@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -15,10 +15,15 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     superlabel.cpp \
-    core.cpp
+    core.cpp \
+    tcpsocket.cpp
 
 HEADERS  += mainwindow.h \
     superlabel.h \
-    core.h
+    core.h \
+    tcpsocket.h \
+    include/SPLStandardMessage.h
 
 FORMS    += mainwindow.ui
+
+INCLUDEPATH += include/

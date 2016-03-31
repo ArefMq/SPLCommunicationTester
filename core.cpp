@@ -1,7 +1,9 @@
 #include "core.h"
 
 Core::Core(SuperLabel& l) :
-    label(l)
+    label(l),
+    transmitterSocket(0),
+    recieverSocket(0)
 {
 }
 
@@ -83,3 +85,28 @@ void Core::transmitPoint(unsigned id)
     transmitPoint(selectedPoints.at(id));
 }
 
+unsigned Core::selectedPointsSize()
+{
+    return selectedPoints.size();
+}
+
+void Core::clearAll()
+{
+    transmittedPoints.clear();
+    recievedPoints.clear();
+    selectedPoints.clear();
+}
+
+void Core::clearSelection()
+{
+    selectedPoints.clear();
+}
+
+void Core::sendLocation()
+{
+//    socket->start("127.0.0.1", 14147);
+    std::cout << "sending..." << std::endl;
+    SenderTimer* senderTimer = new SenderTimer(15);
+//    senderTimer->connect(senderTimer, SIGNAL(finished()), senderTimer, SLOT(deleteLater()));
+    senderTimer->start();
+}
