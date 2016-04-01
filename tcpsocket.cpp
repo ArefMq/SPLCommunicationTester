@@ -7,6 +7,7 @@ TCPSocket::TCPSocket(QObject *parent) :
     QObject(parent)
 {
     connect(&client, SIGNAL(connected()), this, SLOT(startTransfer()));
+    connect(&client, SIGNAL(connected()), this, SLOT(startRecive()));
 }
 
 TCPSocket::~TCPSocket()
@@ -14,27 +15,36 @@ TCPSocket::~TCPSocket()
     terminate();
 }
 
-void TCPSocket::start(QString address, int port)
+void TCPSocket::start()
 {
     QHostAddress addr(address);
     client.connectToHost(addr, port);
 }
 
-#define BUFFER_SIZE 1024
+void TCPSocket::setSocketData(QString Address, int Port)
+{
+    address = Address;
+    port = Port;
+}
+
 void TCPSocket::startTransfer()
 {
-    unsigned char buffer[BUFFER_SIZE];
-    unsigned i=0;
+    client.write((const char*)&splStandardMessage, sizeof(SPLStandardMessage));
+}
 
-    memcpy((void*) buffer+i, (const void*)&x, sizeof(int));
-    i+= sizeof(int);
-    memcpy((void*) buffer+i, (const void*)&y, sizeof(int));
-    i+= sizeof(int);
-
-    client.write((const char*)buffer, BUFFER_SIZE);
+void TCPSocket::startRecive()
+{
+    //client.read((const char*)&splStandardMessage, sizeof(SPLStandardMessage));
 }
 
 void TCPSocket::terminate()
 {
     client.close();
+}
+
+void TCPSocket::setLocationData(int x, int y)
+{
+    // [TODO] : ask TC if these data type should change in future
+    splStandardMessage.ball[0] = x;
+    splStandardMessage.ball[1] = y;
 }

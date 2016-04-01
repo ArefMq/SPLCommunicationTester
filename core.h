@@ -9,35 +9,43 @@
 #include "superlabel.h"
 #include "tcpsocket.h"
 
-class Core
+class SenderTimer : public QThread
 {
-    class SenderTimer : public QThread
-    {
-        Q_OBJECT
-    public:
-        //-- SenderTimer(
-        //          TransferInterval : Time wait till next message
-        SenderTimer(unsigned TransferInterval, QObject* parent=0) : QThread(parent), transferInterval(TransferInterval) {}
-
-    private:
-        unsigned transferInterval;
-
-        void run()
-        {
-            for (unsigned i=0; ;++i)
-            {
-                sleep(1);
-                std::cout << "hi" << std::endl;
-            }
-        }
-
-    signals:
-        void tick(int);
-        void nextTransfer();
-    };
-
+    Q_OBJECT
 public:
+    //-- SenderTimer(
+    //          TransferInterval : Time wait till next message
+    SenderTimer(unsigned TransferInterval, QObject* parent=0) : QThread(parent), transferInterval(TransferInterval) {}
+
+private:
+    unsigned transferInterval;
+
+    void run()
+    {
+        for (unsigned i=0; ;++i)
+        {
+            sleep(1);
+            emit tick(i);
+
+            if (i % transferInterval == 0)
+                emit nextTransfer();
+        }
+    }
+
+signals:
+    void tick(int);
+    void nextTransfer();
+};
+
+class Core : public QObject
+{
+    Q_OBJECT
+public:
+    //Overload constructor
     Core(SuperLabel& label);
+
+    //Default destructor
+    ~Core();
 
     //-- Location Message
     void refresh();
@@ -52,8 +60,8 @@ public:
 
     void sendLocation();
 
-
 private:
+    SenderTimer* senderTimer;
     SuperLabel& label;
     TCPSocket *transmitterSocket;
     TCPSocket *recieverSocket;
@@ -64,6 +72,9 @@ private:
     void drawField();
     void drawPoints();
     void drawInitialPoints();
+
+private slots:
+    void sendOneLocation();
 };
 
 #endif // CORE_H

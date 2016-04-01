@@ -1,10 +1,17 @@
 #include "core.h"
 
 Core::Core(SuperLabel& l) :
+    senderTimer(0),
     label(l),
     transmitterSocket(0),
     recieverSocket(0)
 {
+    transmitterSocket = new TCPSocket(0);
+}
+
+Core::~Core()
+{
+    delete transmitterSocket;
 }
 
 void Core::drawField()
@@ -104,9 +111,25 @@ void Core::clearSelection()
 
 void Core::sendLocation()
 {
-//    socket->start("127.0.0.1", 14147);
-    std::cout << "sending..." << std::endl;
-    SenderTimer* senderTimer = new SenderTimer(15);
-//    senderTimer->connect(senderTimer, SIGNAL(finished()), senderTimer, SLOT(deleteLater()));
+    senderTimer = new SenderTimer(15);
+    connect(senderTimer, SIGNAL(finished()), senderTimer, SLOT(deleteLater()));
+    connect(senderTimer, SIGNAL(nextTransfer()), this, SLOT(sendOneLocation()));
     senderTimer->start();
+}
+
+void Core::sendOneLocation()
+{
+    if (!selectedPoints.size())
+    {
+        senderTimer->terminate();
+        return;
+    }
+
+    transmitPoint(selectedPoints.back());
+    transmitterSocket->setSocketData("127.0.0.1", 4343); // [FIXME] : get this from ui
+    transmitterSocket->setLocationData(transmittedPoints.back().x(), transmittedPoints.back().y());
+    transmitterSocket->start();
+
+    selectedPoints.pop_back();
+    refresh();
 }
